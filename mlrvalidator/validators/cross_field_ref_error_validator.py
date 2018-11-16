@@ -5,7 +5,7 @@ import re
 
 from .base_cross_field_validator import BaseCrossFieldValidator
 from .country_state_reference_validator import CountryStateReferenceValidator
-from .reference import States, NationalWaterUseCodes, SiteTypesCrossField, Counties, LandNetCrossField
+from .reference import States, NationalWaterUseCodes, SiteTypesCrossField, Counties, LandNetCrossField, SiteNumberFormat
 
 
 class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
@@ -21,6 +21,7 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
         self.states_ref = States(os.path.join(reference_dir, 'state.json'))
         self.national_water_use_ref = NationalWaterUseCodes(os.path.join(reference_dir, 'national_water_use.json'))
         self.land_net_ref = LandNetCrossField(os.path.join(reference_dir, 'land_net.json'))
+        self.site_number_format_ref = SiteNumberFormat(os.path.join(reference_dir,'site_number_format.json'))
         self.site_type_ref = SiteTypesCrossField(os.path.join(reference_dir, 'site_type_cross_field.json'))
 
     def _validate_counties(self):
