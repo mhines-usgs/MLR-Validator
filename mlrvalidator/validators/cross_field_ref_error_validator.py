@@ -76,6 +76,9 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
 
     def _validate_site_type(self):
         site_type = self.merged_document.get('siteTypeCode', '').strip()
+        is_updated = self.merged_document.get('updated', '')
+        invalid_site = not is_updated == True and site_type == 'SS' or site_type == 'FA'
+        self._errors['siteTypeCode'] = []
 
         if site_type:
             site_type_attr = self.site_type_ref.get_site_type_field_dependencies(site_type)
@@ -83,6 +86,9 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
                 # Should check all fields in site_type_attr
                 not_null_attrs = site_type_attr.get('notNullAttrs', [])
                 null_attrs = site_type_attr.get('nullAttrs', [])
+                if invalid_site:
+                    self._errors['siteTypeCode'].append(           
+                        'Non-valid site type ({0}) - may not use a non-valid code for new site creation'.format(site_type))
             else:
                 # Only check fields that are in the document
                 not_null_attrs = [not_null_attr for not_null_attr in site_type_attr.get('notNullAttrs', [])
@@ -102,13 +108,13 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
                     null_errors.append(null_attr)
 
             if not_null_errors or null_errors:
-                self._errors['siteTypeCode'] = []
-                if not_null_errors:
-                    self._errors['siteTypeCode'].append(
-                        'Site type {0} must not have the following attributes null: {1}'.format(site_type, ', '.join(not_null_errors)))
-                if null_errors:
-                    self._errors['siteTypeCode'].append(
-                        'Site type {0} must have the following attributes null: {1}'.format(site_type, ', '.join(null_errors)))
+                if not invalid_site:
+                    if not_null_errors:
+                        self._errors['siteTypeCode'].append(
+                            'Site type {0} must not have the following attributes null: {1}'.format(site_type, ', '.join(not_null_errors)))
+                    if null_errors:
+                        self._errors['siteTypeCode'].append(
+                            'Site type {0} must have the following attributes null: {1}'.format(site_type, ', '.join(null_errors)))
 
     def _validate_land_net(self):
         # Check that the land net description field follows the correct template

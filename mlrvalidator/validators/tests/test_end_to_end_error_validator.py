@@ -106,6 +106,9 @@ class ErrorValidatorSiteNumberTestCase(BaseE2ETestCase):
         self.assertFalse(self.v.validate({'siteNumber': '0123'}, {}, update=True))
         self.assertEqual(len(self.v.errors.get('siteNumber')), 1)
 
+    def test_site_type_create_invalid_type(self):
+        self.assertFalse(self.v.validate({'siteTypeCode': 'SS', 'siteNumber': '12345678'}, {}, update=False))
+        self.assertFalse(self.v.validate({'siteTypeCode': 'FA', 'siteNumber': '12345678'}, {}, update=False))
 
 class ErrorValidatorStationNameTestCase(BaseE2ETestCase):
 
