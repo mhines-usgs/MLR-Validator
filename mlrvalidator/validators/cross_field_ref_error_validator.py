@@ -76,6 +76,8 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
 
     def _validate_site_type(self):
         site_type = self.merged_document.get('siteTypeCode', '').strip()
+        is_updated = self.merged_document.get('updated', '')
+        invalid_site = not is_updated == True and site_type == 'SS' or site_type == 'FA'
 
         if site_type:
             site_type_attr = self.site_type_ref.get_site_type_field_dependencies(site_type)
@@ -101,7 +103,7 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
                 if self.merged_document.get(null_attr, '').strip():
                     null_errors.append(null_attr)
 
-            if not_null_errors or null_errors:
+            if not_null_errors or null_errors and not invalid_site:
                 self._errors['siteTypeCode'] = []
                 if not_null_errors:
                     self._errors['siteTypeCode'].append(
@@ -109,6 +111,10 @@ class CrossFieldRefErrorValidator(BaseCrossFieldValidator):
                 if null_errors:
                     self._errors['siteTypeCode'].append(
                         'Site type {0} must have the following attributes null: {1}'.format(site_type, ', '.join(null_errors)))
+            if invalid_site:
+                self._errors['siteTypeCode'] = []
+                self._errors['siteTypeCode'].append(
+                    'Non-valid site type ({0}) - may not use a non-valid code for new site creation'.format(site_type))
 
     def _validate_land_net(self):
         # Check that the land net description field follows the correct template

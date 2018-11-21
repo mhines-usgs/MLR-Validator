@@ -159,6 +159,9 @@ class ErrorValidatorSiteNumberTestCase(BaseE2ETestCase):
     def test_site_number_llwu_wrong_first_digit_invalid(self):
         self.assertFalse(self.v.validate({'siteTypeCode': 'FA-CI', 'siteNumber': '087654321098'}, {}, update=True))
 
+    def test_site_type_create_invalid_type(self):
+        self.assertFalse(self.v.validate({'siteTypeCode': 'SS', 'siteNumber': '12345678'}, {}, update=False))
+        self.assertFalse(self.v.validate({'siteTypeCode': 'FA', 'siteNumber': '12345678'}, {}, update=False))
 
 class ErrorValidatorStationNameTestCase(BaseE2ETestCase):
 
