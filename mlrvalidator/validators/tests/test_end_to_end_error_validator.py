@@ -160,8 +160,12 @@ class ErrorValidatorSiteNumberTestCase(BaseE2ETestCase):
         self.assertFalse(self.v.validate({'siteTypeCode': 'FA-CI', 'siteNumber': '087654321098'}, {}, update=True))
 
     def test_site_type_create_invalid_type(self):
-        self.assertFalse(self.v.validate({'siteTypeCode': 'SS', 'siteNumber': '12345678'}, {}, update=False))
-        self.assertFalse(self.v.validate({'siteTypeCode': 'FA', 'siteNumber': '12345678'}, {}, update=False))
+        self.assertFalse(self.v.validate({'agencyCode':'USGS', 'siteTypeCode': 'SS', 'siteNumber': '423008088404003'}, {}, update=False))
+        self.assertFalse(self.v.validate({'agencyCode':'USGS', 'siteTypeCode': 'FA', 'siteNumber': '01126999501'}, {}, update=False))
+
+    def test_site_type_update_valid_type(self):
+        self.assertTrue(self.v.validate({'agencyCode':'USGS', 'siteTypeCode': 'FA', 'siteNumber': '01126999501'}, {}, update=True))
+        self.assertTrue(self.v.validate({'agencyCode':'USGS', 'siteTypeCode': 'SS', 'siteNumber': '423008088404003'}, {}, update=True))
 
 class ErrorValidatorStationNameTestCase(BaseE2ETestCase):
 

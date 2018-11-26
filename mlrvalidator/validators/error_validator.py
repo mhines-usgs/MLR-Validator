@@ -35,8 +35,11 @@ class ErrorValidator:
         self.single_field_validator.validate(ddot_location, update=update)
         self.cross_field_validator.validate(ddot_location, existing_location)
         self.cross_field_ref_validator.validate(ddot_location, existing_location)
+        site_type = ddot_location.get('siteTypeCode', '').strip()
+        invalid_site = site_type == 'SS' or site_type == 'FA'
 
         duplicate_error = {}
+        siteTypeCode_error = {}
         if update:
             self.transition_validator.validate(ddot_location, existing_location)
             transition_errors = self.transition_validator.errors
@@ -48,10 +51,16 @@ class ErrorValidator:
                         'Site with agencyCode {0} and siteNumber {1} already exists'.format(existing_location.get('agencyCode'),
                                                                                              existing_location.get('siteNumber'))]
                 }
+                if invalid_site:
+                    siteTypeCode_error = {
+                    'site_type': [
+                        'Non-valid site type ({0}) - may not use a non-valid code for new site creation'.format(site_type)]
+                    }
 
         self._errors = defaultdict(list)
         all_errors = chain(
             duplicate_error.items(),
+            siteTypeCode_error.items(),
             self.single_field_validator.errors.items(),
             self.cross_field_validator.errors.items(),
             self.cross_field_ref_validator.errors.items(),
