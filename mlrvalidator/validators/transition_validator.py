@@ -2,9 +2,9 @@
 import os
 import json
 from mlrvalidator.utils import get_dict
-from .reference import SiteTypeInvalidCodes, FieldTransitions
+from .reference import FieldTransitions
 
-class TransitionValidator(SiteTypeInvalidCodes):
+class TransitionValidator:
 
     def __init__(self, reference_dir):
         self.site_type_transition_ref = FieldTransitions(os.path.join(reference_dir, 'site_type_transition.json'))
