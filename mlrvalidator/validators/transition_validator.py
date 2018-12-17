@@ -1,15 +1,21 @@
 
 import os
+import json
+from mlrvalidator.utils import get_dict
+from .reference import SiteTypeInvalidCodes, FieldTransitions
 
-from .reference import ReferenceInfo, FieldTransitions
-
-class TransitionValidator:
+class TransitionValidator(SiteTypeInvalidCodes):
 
     def __init__(self, reference_dir):
-        self._errors = {}
         self.site_type_transition_ref = FieldTransitions(os.path.join(reference_dir, 'site_type_transition.json'))
-        self.reference_lists = ReferenceInfo(os.path.join(reference_dir, 'reference_lists.json'))
-        self.site_type_invalid_code_list = self.reference_lists.get_reference_info().get('siteTypeInvalidCode', [])
+        
+        fd = open(os.path.join(reference_dir,'reference_lists.json'))
+        with fd:
+            self.reference_info = json.loads(fd.read())
+
+    def get_reference_info(self):
+        return self.reference_info
+
 
     def validate(self, document, existing_document):
         self._errors = {}
@@ -21,7 +27,8 @@ class TransitionValidator:
             if transitions and transitions.count(new_value) == 0:
                 self._errors['siteTypeCode'] = ['Can\'t change a siteTypeCode with existing value {0} to {1}'.format(existing_value, new_value)]
 
-        if existing_value in self.site_type_invalid_code_list and new_value is '' or new_value in self.site_type_invalid_code_list:
+        invalid_list = self.reference_info['siteTypeInvalidCode']
+        if existing_value in invalid_list and new_value is '' or new_value in invalid_list:
             self._errors['siteTypeCode'] = ['Existing record uses a non-valid site type, may not use a non-valid code for site creation or updates. Re-submit with a valid siteTypeCode.']
 
         return self._errors == {}
